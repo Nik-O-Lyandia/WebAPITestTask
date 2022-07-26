@@ -23,9 +23,9 @@ namespace WebApp.Controllers
             {
                 return Ok(_bitcoinSrvice.Rate());
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -44,9 +44,9 @@ namespace WebApp.Controllers
             {
                 return Conflict(ex.Message);
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
             return Ok();
         }

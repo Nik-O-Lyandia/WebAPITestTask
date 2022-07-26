@@ -100,11 +100,14 @@ namespace WebApp.Services
                 {
                     client.Send(mail);
                 }
-
                 catch (Exception ex)
                 {
                     throw ex;
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException("No subscribed addresses availible");
             }
         }
     }
