@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿/*
+ * BitcoinService provides all logic for BitcoinController
+ */
+
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
@@ -18,8 +22,10 @@ namespace WebApp.Services
             _clientFactory = clientFactory;
             _config = config;
         }
+
         public decimal Rate()
         {
+            // Creating Http client for third-party API to get current rates for Bitcoin
             var client = _clientFactory.CreateClient();
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -27,6 +33,7 @@ namespace WebApp.Services
             var response = client.Send(request);
 
             var contentStream = response.Content.ReadAsStream();
+            // Third-party API provides data in JSON, so we're deserializing it
             var currencies = JsonSerializer.Deserialize<List<Currency>>(contentStream);
 
             Currency finalCurrency = new Currency();
@@ -47,7 +54,8 @@ namespace WebApp.Services
 
         public void Subscribe(string email)
         {
-            Regex rgx = new Regex("^[a-zA-Z0-9.]+[@][a-z]+[.][a-z]+");
+            // Using Regex to accept emails names that compatible with gmail standard
+            Regex rgx = new Regex("^[a-zA-Z0-9.]+[@][a-z]+[a-z.]+");
 
             if (rgx.IsMatch(email))
             {
@@ -75,6 +83,7 @@ namespace WebApp.Services
             if (allEmails != null)
             {
                 var rate = Rate();
+                // Using Secrets.json for hide important data such as passwords
                 var fromEmailAddress = _config.GetValue<string>("Email");
                 var fromEmailAppPassword = _config.GetValue<string>("EmailAppPassword");
 

@@ -8,14 +8,15 @@ namespace WebApp.Controllers
     [Route("[controller]")]
     public class BitcoinController : Controller
     {
+        // BitcoinService provides main logic while controller itself only manages results
         BitcoinService _bitcoinSrvice;
 
         public BitcoinController(IHttpClientFactory clientFactory, IConfiguration config)
         {
+            // Instant transfer of interfaces to BitcoinService because of no need of stashing them in controller
             _bitcoinSrvice = new BitcoinService(clientFactory, config);
         }
 
-        // GET: BitcoinController
         [HttpGet("rate")]
         public ActionResult Rate()
         {

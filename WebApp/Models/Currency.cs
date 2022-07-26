@@ -1,13 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿/*
+ * A Сurrency class to make third-party JSON response deserialization possible
+ */
+using System.Text.Json.Serialization;
 
 namespace WebApp.Models
 {
     public class Currency
     {
         [JsonPropertyName("code")]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [JsonPropertyName("rate")]
         public decimal Rate { get; set; }
     }
