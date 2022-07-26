@@ -10,9 +10,9 @@ namespace WebApp.Controllers
     {
         BitcoinService _bitcoinSrvice;
 
-        public BitcoinController(IHttpClientFactory clientFactory)
+        public BitcoinController(IHttpClientFactory clientFactory, IConfiguration config)
         {
-            _bitcoinSrvice = new BitcoinService(clientFactory);
+            _bitcoinSrvice = new BitcoinService(clientFactory, config);
         }
 
         // GET: BitcoinController
@@ -58,9 +58,9 @@ namespace WebApp.Controllers
             {
                 _bitcoinSrvice.SendEmails();
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
             return Ok();
         }
