@@ -77,10 +77,6 @@ namespace WebApp.Services
                 {
                     File.AppendAllText(_emailsFilePath, email + "\n");
                 }
-                catch (DirectoryNotFoundException ex)
-                {
-                    File.AppendAllText(_emailsFilePath, email + "\n");
-                }
             }
             else
             {
