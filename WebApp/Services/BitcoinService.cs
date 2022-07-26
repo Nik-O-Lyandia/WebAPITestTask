@@ -59,15 +59,27 @@ namespace WebApp.Services
 
             if (rgx.IsMatch(email))
             {
-                var allEmails = File.ReadAllLines(_emailsFilePath);
+                string[]? allEmails;
+                try
+                {
+                    allEmails = File.ReadAllLines(_emailsFilePath);
 
-                if (!allEmails.Contains(email))
+                    if (!allEmails.Contains(email))
+                    {
+                        File.AppendAllText(_emailsFilePath, email + "\n");
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Address '{email}' is already subscribed");
+                    }
+                }
+                catch (FileNotFoundException ex)
                 {
                     File.AppendAllText(_emailsFilePath, email + "\n");
                 }
-                else
+                catch (DirectoryNotFoundException ex)
                 {
-                    throw new InvalidOperationException($"Address '{email}' is already subscribed");
+                    File.AppendAllText(_emailsFilePath, email + "\n");
                 }
             }
             else
