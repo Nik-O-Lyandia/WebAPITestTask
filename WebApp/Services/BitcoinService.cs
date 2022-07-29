@@ -36,20 +36,9 @@ namespace WebApp.Services
             // Third-party API provides data in JSON, so we're deserializing it
             var currencies = JsonSerializer.Deserialize<List<Currency>>(contentStream);
 
-            Currency finalCurrency = new Currency();
+            if (currencies == null) return 0;
 
-            if (currencies != null)
-            {
-                foreach (Currency cur in currencies)
-                {
-                    if (cur.Code == "UAH")
-                    {
-                        finalCurrency = cur;
-                    }
-                }
-            }
-
-            return finalCurrency.Rate;
+            return currencies.Single(c => c.Code == "UAH").Rate;
         }
 
         public void Subscribe(string email)
@@ -57,32 +46,27 @@ namespace WebApp.Services
             // Using Regex to accept emails names that compatible with gmail standard
             Regex rgx = new Regex("^[a-zA-Z0-9.]+[@][a-z]+[a-z.]+");
 
-            if (rgx.IsMatch(email))
-            {
-                string[]? allEmails;
-                try
-                {
-                    allEmails = File.ReadAllLines(_emailsFilePath);
+            if (!rgx.IsMatch(email)) throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
 
-                    if (allEmails.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
-                }
-                catch (FileNotFoundException ex)
-                {
-                    Console.WriteLine("File emails.txt is missed. Creating a new one");
-                }
-                catch (DirectoryNotFoundException ex)
-                {
-                    Console.WriteLine("Folder 'Data/' is missed. Creating a new one");
-                    Directory.CreateDirectory("./Data");
-                }
-                finally
-                {
-                    File.AppendAllText(_emailsFilePath, email + "\n");
-                }
-            }
-            else
+            string[]? allEmails;
+            try
             {
-                throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
+                allEmails = File.ReadAllLines(_emailsFilePath);
+
+                if (allEmails.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("File emails.txt is missed. Creating a new one");
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine("Folder 'Data/' is missed. Creating a new one");
+                Directory.CreateDirectory("./Data");
+            }
+            finally
+            {
+                File.AppendAllText(_emailsFilePath, email + "\n");
             }
         }
 
@@ -90,24 +74,24 @@ namespace WebApp.Services
         {
             var allEmails = File.ReadAllLines(_emailsFilePath);
 
-            if (allEmails != null)
+            if (allEmails == null) throw new InvalidOperationException("No subscribed addresses availible");
+
+            var rate = Rate();
+            // Using Secrets.json for hide important data such as passwords
+            var fromEmailAddress = _config.GetValue<string>("Email");
+            var fromEmailAppPassword = _config.GetValue<string>("EmailAppPassword");
+
+            SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+            client.Credentials = new NetworkCredential(fromEmailAddress, fromEmailAppPassword);
+            client.EnableSsl = true;
+
+            foreach (var email in allEmails)
             {
-                var rate = Rate();
-                // Using Secrets.json for hide important data such as passwords
-                var fromEmailAddress = _config.GetValue<string>("Email");
-                var fromEmailAppPassword = _config.GetValue<string>("EmailAppPassword");
-
-                SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-                client.Credentials = new NetworkCredential(fromEmailAddress, fromEmailAppPassword);
-                client.EnableSsl = true;
-
                 MailMessage mail = new MailMessage();
                 mail.From = new MailAddress(fromEmailAddress, "BTC to UAH Service");
 
-                foreach (var email in allEmails)
-                {
-                    mail.To.Add(new MailAddress(email));
-                }
+                mail.To.Add(new MailAddress(email));
+
 
                 mail.Subject = "BTC to UAH";
                 mail.SubjectEncoding = Encoding.UTF8;
@@ -121,12 +105,8 @@ namespace WebApp.Services
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    Console.WriteLine(ex.ToString());
                 }
-            }
-            else
-            {
-                throw new InvalidOperationException("No subscribed addresses availible");
             }
         }
     }

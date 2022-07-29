@@ -26,7 +26,8 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest();
+                Console.WriteLine(ex.Message);
+                return StatusCode(500);
             }
         }
 
@@ -47,7 +48,8 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound();
+                Console.WriteLine(ex.Message);
+                return StatusCode(500);
             }
             return Ok();
         }
@@ -61,7 +63,8 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest();
+                Console.WriteLine(ex.Message);
+                return StatusCode(500);
             }
             return Ok();
         }
