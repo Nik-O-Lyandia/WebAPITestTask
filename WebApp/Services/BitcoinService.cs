@@ -44,7 +44,7 @@ namespace WebApp.Services
         public void Subscribe(string email)
         {
             // Using Regex to accept emails names that compatible with gmail standard
-            Regex rgx = new Regex("^[a-zA-Z0-9.]+[@][a-z]+[a-z.]+");
+            Regex rgx = new Regex(@"^[a-zA-Z0-9.]+[@][a-z]+[.][a-z.]+");
 
             if (!rgx.IsMatch(email)) throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
 
@@ -54,18 +54,18 @@ namespace WebApp.Services
                 allEmails = File.ReadAllLines(_emailsFilePath);
 
                 if (allEmails.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
-            }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine("File emails.txt is missed. Creating a new one");
+
+                File.AppendAllText(_emailsFilePath, email + "\n");
             }
             catch (DirectoryNotFoundException ex)
             {
                 Console.WriteLine("Folder 'Data/' is missed. Creating a new one");
                 Directory.CreateDirectory("./Data");
+                File.AppendAllText(_emailsFilePath, email + "\n");
             }
-            finally
+            catch (FileNotFoundException ex)
             {
+                Console.WriteLine("File emails.txt is missed. Creating a new one");
                 File.AppendAllText(_emailsFilePath, email + "\n");
             }
         }
