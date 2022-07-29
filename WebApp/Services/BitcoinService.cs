@@ -80,7 +80,7 @@ namespace WebApp.Services
             }
             else
             {
-                throw new ArgumentException("Wrong email address");
+                throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
             }
         }
 

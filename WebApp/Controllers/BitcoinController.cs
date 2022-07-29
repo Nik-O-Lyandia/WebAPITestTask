@@ -5,7 +5,7 @@ using WebApp.Services;
 namespace WebApp.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api")]
     public class BitcoinController : Controller
     {
         // BitcoinService provides main logic while controller itself only manages results
@@ -31,7 +31,7 @@ namespace WebApp.Controllers
         }
 
         [HttpPost("subscribe")]
-        public ActionResult Subscribe(string email)
+        public ActionResult Subscribe([FromForm] string email)
         {
             try
             {
