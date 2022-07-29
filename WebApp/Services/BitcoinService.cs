@@ -13,7 +13,7 @@ namespace WebApp.Services
 {
     public class BitcoinService
     {
-        private const string _emailsFilePath = "Src/emails.txt";
+        private const string _emailsFilePath = "Data/emails.txt";
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _config;
 
@@ -64,16 +64,18 @@ namespace WebApp.Services
                 {
                     allEmails = File.ReadAllLines(_emailsFilePath);
 
-                    if (!allEmails.Contains(email))
-                    {
-                        File.AppendAllText(_emailsFilePath, email + "\n");
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Address '{email}' is already subscribed");
-                    }
+                    if (allEmails.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
                 }
                 catch (FileNotFoundException ex)
+                {
+                    Console.WriteLine("File emails.txt is missed. Creating a new one");
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    Console.WriteLine("Folder 'Data/' is missed. Creating a new one");
+                    Directory.CreateDirectory("./Data");
+                }
+                finally
                 {
                     File.AppendAllText(_emailsFilePath, email + "\n");
                 }

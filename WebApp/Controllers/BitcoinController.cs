@@ -26,7 +26,7 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
         }
 
@@ -47,7 +47,7 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return NotFound();
             }
             return Ok();
         }
@@ -61,7 +61,7 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
             return Ok();
         }
