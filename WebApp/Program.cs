@@ -14,6 +14,7 @@ builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<IHttpService, HttpService>();
 
 builder.Services.AddControllers();
+builder.Services.AddLogging();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

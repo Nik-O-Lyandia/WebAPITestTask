@@ -8,20 +8,14 @@ namespace WebApp.Services
 {
     public class DataService : IDataService
     {
-        private readonly IConfiguration _configuration;
-        public DataService(IConfiguration configuration)
+        public string[] ReadEmails(string path)
         {
-            _configuration = configuration;
+            return File.ReadAllLines(path);
         }
 
-        public string[]? ReadEmails()
+        public void WriteEmail(string email, string path)
         {
-            return File.ReadAllLines(_configuration.GetValue<string>("EmailsFilePath"));
-        }
-
-        public void WriteEmail(string email)
-        {
-            File.AppendAllText(_configuration.GetValue<string>("EmailsFilePath"), email + "\n");
+            File.AppendAllText(path, email + "\n");
         }
     }
 }

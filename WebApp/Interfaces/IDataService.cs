@@ -2,7 +2,7 @@
 {
     public interface IDataService
     {
-        public string[]? ReadEmails();
-        public void WriteEmail(string email);
+        public string[] ReadEmails(string path);
+        public void WriteEmail(string email, string path);
     }
 }

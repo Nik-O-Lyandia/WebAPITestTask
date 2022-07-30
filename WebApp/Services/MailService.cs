@@ -25,38 +25,33 @@ namespace WebApp.Services
 
         public void Subscribe(string email)
         {
-            // Using Regex to accept emails names that compatible with gmail standard
-            Regex rgx = new Regex(@"^[a-zA-Z0-9.]+[@][a-z]+[.][a-z.]+");
+            if (EmailIsValid(email)) throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
 
-            if (!rgx.IsMatch(email)) throw new ArgumentException("Wrong email address. Allowed only letters, numbers & periods");
-
-            string[]? emailsList;
+            string[]? emails;
             try
             {
-                emailsList = _dataService.ReadEmails();
+                emails = _dataService.ReadEmails(_configuration.GetValue<string>("EmailsFilePath"));
 
-                if (emailsList.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
+                if (emails.Contains(email)) throw new InvalidOperationException($"Address '{email}' is already subscribed");
 
-                _dataService.WriteEmail(email);
+                _dataService.WriteEmail(email, _configuration.GetValue<string>("EmailsFilePath"));
             }
             catch (DirectoryNotFoundException ex)
             {
                 Console.WriteLine("Folder 'Data/' is missed. Creating a new one");
-                Directory.CreateDirectory("./Data");
-                _dataService.WriteEmail(email);
+                Directory.CreateDirectory(Path.GetDirectoryName(_configuration.GetValue<string>("EmailsFilePath")));
+                _dataService.WriteEmail(email, _configuration.GetValue<string>("EmailsFilePath"));
             }
             catch (FileNotFoundException ex)
             {
                 Console.WriteLine("File emails.txt is missed. Creating a new one");
-                _dataService.WriteEmail(email);
+                _dataService.WriteEmail(email, _configuration.GetValue<string>("EmailsFilePath"));
             }
         }
 
         public void SendEmails()
         {
-            var emailsList = _dataService.ReadEmails();
-
-            if (emailsList == null) throw new InvalidOperationException("No subscribed addresses availible");
+            string[] emails = _dataService.ReadEmails(_configuration.GetValue<string>("EmailsFilePath"));
 
             var rate = _bitcoinService.Rate();
             // Using Secrets.json for hide important data such as passwords
@@ -67,7 +62,7 @@ namespace WebApp.Services
             client.Credentials = new NetworkCredential(fromEmailAddress, fromEmailAppPassword);
             client.EnableSsl = true;
 
-            foreach (var email in emailsList)
+            foreach (var email in emails)
             {
                 MailMessage mail = new MailMessage();
                 mail.From = new MailAddress(fromEmailAddress, "BTC to UAH Service");
@@ -90,6 +85,14 @@ namespace WebApp.Services
                     Console.WriteLine(ex.ToString());
                 }
             }
+        }
+
+        private bool EmailIsValid(string email)
+        {
+            // Using Regex to accept emails names that compatible with gmail standard
+            Regex rgx = new Regex(@"^[a-zA-Z0-9.]+[@][a-z]+[.][a-z.]+");
+
+            return rgx.IsMatch(email);
         }
     }
 }
