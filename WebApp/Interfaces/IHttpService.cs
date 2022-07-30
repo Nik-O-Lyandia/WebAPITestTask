@@ -2,6 +2,6 @@
 {
     public interface IHttpService
     {
-        public string GetResponse();
+        public string Get(string url);
     }
 }

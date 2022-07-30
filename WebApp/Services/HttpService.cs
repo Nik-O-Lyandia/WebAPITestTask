@@ -14,13 +14,13 @@ namespace WebApp.Services
             _clientFactory = clientFactory;
         }
 
-        public string GetResponse()
+        public string Get(string url)
         {
             // Creating Http client for third-party API to get current rates for Bitcoin
             var client = _clientFactory.CreateClient();
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                "https://bitpay.com/api/rates");
+                url);
             var response = client.Send(request);
 
             return response.Content.ReadAsStringAsync().Result;

@@ -11,16 +11,18 @@ namespace WebApp.Services
     public class BitcoinService : IBitcoinService
     {
         private readonly IHttpService _httpService;
+        private readonly IConfiguration _configuration;
 
-        public BitcoinService(IHttpService httpService)
+        public BitcoinService(IHttpService httpService, IConfiguration configuration)
         {
             _httpService = httpService;
+            _configuration = configuration;
         }
 
         public decimal Rate()
         {
             //Getting response from third-party API
-            string response = _httpService.GetResponse();
+            string response = _httpService.Get(_configuration.GetValue<string>("BitcoinRateAPIURL"));
 
             // Third-party API provides data in JSON, so we're deserializing it
             var currencies = JsonSerializer.Deserialize<List<Currency>>(response);
