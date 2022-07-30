@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Services;
+using WebApp.Interfaces;
 
 namespace WebApp.Controllers
 {
@@ -8,13 +9,14 @@ namespace WebApp.Controllers
     [Route("/api")]
     public class BitcoinController : Controller
     {
-        // BitcoinService provides main logic while controller itself only manages results
-        BitcoinService _bitcoinSrvice;
+        // BitcoinService and MailService provide main logic while controller itself only manages results
+        private readonly IBitcoinService _bitcoinSrvice;
+        private readonly IMailService _mailService;
 
-        public BitcoinController(IHttpClientFactory clientFactory, IConfiguration config)
+        public BitcoinController(IBitcoinService bitcoinService, IMailService mailService)
         {
-            // Instant transfer of interfaces to BitcoinService because of no need of stashing them in controller
-            _bitcoinSrvice = new BitcoinService(clientFactory, config);
+            _bitcoinSrvice = bitcoinService;
+            _mailService = mailService;
         }
 
         [HttpGet("rate")]
@@ -36,7 +38,7 @@ namespace WebApp.Controllers
         {
             try
             {
-                _bitcoinSrvice.Subscribe(email);
+                _mailService.Subscribe(email);
             }
             catch (ArgumentException ex)
             {
@@ -59,7 +61,7 @@ namespace WebApp.Controllers
         {
             try
             {
-                _bitcoinSrvice.SendEmails();
+                _mailService.SendEmails();
             }
             catch (Exception ex)
             {
